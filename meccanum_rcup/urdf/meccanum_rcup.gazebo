@@ -1,0 +1,110 @@
+<?xml version="1.0" ?>
+<!-- #################################################### -->
+<!-- GAZEBO ADDITIONAL DESCRIPTION OF THE 4-WHEELED ROBOT -->
+<!-- #################################################### -->
+<robot>
+
+  <!-- mu1 and mu2 are friction coefficients -->
+  <gazebo reference="body_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material>Gazebo/Red</material>
+  </gazebo>
+
+  <gazebo reference="wheel1_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <gazebo reference="wheel2_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <gazebo reference="wheel3_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <gazebo reference="wheel4_link">
+    <mu1>0.2</mu1>
+    <mu2>0.2</mu2>
+    <material>Gazebo/Black</material>
+  </gazebo>
+  
+  <gazebo reference="lidar_frame">
+    <material>Gazebo/Blue</material>
+
+    <sensor name="lidar" type="ray">
+        <pose> 0 0 0 0 0 0 </pose>
+        <visualize>true</visualize>
+        <update_rate>15.0</update_rate>
+        <ray>
+            <scan>
+                <horizontal>
+                    <samples>360</samples>
+                    <min_angle>-1.57</min_angle>
+                    <max_angle>1.57</max_angle>
+                </horizontal>
+            </scan>
+            <range>
+                <min>0.3</min>
+                <max>5.0</max>
+            </range>
+        </ray>
+        <plugin name="lidar_controller" filename="libgazebo_ros_ray_sensor.so">
+            <ros>
+                <argument>~/out:=scan</argument>
+            </ros>
+            <output_type>sensor_msgs/LaserScan</output_type>
+            <frame_name>laser_frame</frame_name>
+        </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- Controller for the 4-wheeled robot -->
+  <gazebo>
+    <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+      <!-- Control update rate in Hz -->
+      <updateRate>100.0</updateRate>
+      <!-- Leave this empty otherwise, there will be problems with sending control commands -->
+      <robotNamespace> </robotNamespace>
+      <!-- Robot kinematics -->
+      <leftFrontJoint>wheel4_joint</leftFrontJoint>
+      <rightFrontJoint>wheel3_joint</rightFrontJoint>
+      <leftRearJoint>wheel2_joint</leftRearJoint>
+      <rightRearJoint>wheel1_joint</rightRearJoint>
+      <wheelSeparation>${body_link_y_dim+wheel_link_length}</wheelSeparation>
+      <wheelDiameter>${wheel_link_radius}</wheelDiameter>
+
+      <!-- Maximum torque which the wheels can produce, in Nm, defaults to 5 Nm -->
+      <torque>1000</torque>
+      
+      <!-- Topic to receive geometry_msgs/Twist message commands, defaults to 'cmd_vel' -->
+      <commandTopic>cmd_vel</commandTopic>
+      <!-- Topic to publish nav_msgs/Odometry messages, defaults to 'odom' -->
+      <odometryTopic>odom</odometryTopic>
+      <!-- Odometry frame, defaults to 'odom' -->
+      <odometryFrame>odom</odometryFrame>
+      <!-- Odometry Rate, defaults to 'odom' -->
+      <odometryRate>10.0</odometryRate>
+      <!-- Robot frame to calculate odometry from, defaults to 'base_footprint' -->
+      <robotBaseFrame>dummy</robotBaseFrame>
+      <!-- Set to true to publish transforms for the wheel links, defaults to false -->
+      <publishWheelTF>true</publishWheelTF>
+      <!-- Set to true to publish transforms for the wheel links, defaults to true -->
+      <publishOdom>true</publishOdom>
+      <!-- Set to true to publish sensor_msgs/JointState on /joint_state for the wheel joints, defaults to false -->
+      <publishWheelJointState>true</publishWheelJointState>
+      <!-- This part is required by Gazebo -->
+      <covariance_x>0.0001</covariance_x>
+      <covariance_y>0.0001</covariance_y>
+      <covariance_yaw>0.01</covariance_yaw>
+    </plugin>
+
+  </gazebo>
+
+</robot>
